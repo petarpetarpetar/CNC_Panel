@@ -51,7 +51,7 @@ build/
 
 # Binaries
 bin/*
-
+!bin/.gitkeep
 # Idea
 .idea
 

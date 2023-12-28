@@ -29,5 +29,5 @@ mkdir -p ~/.local/bin/
 cp -v Candle ~/.local/bin/
 
 popd
-rm -rf Candle
+#rm -rf Candle
 
