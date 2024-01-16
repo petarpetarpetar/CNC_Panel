@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <termios.h>
 
-#define SERIAL_PORT "/dev/ttyUSB0"  // Replace with the correct serial port
+#define SERIAL_PORT "/dev/ttyUSB1"  // Replace with the correct serial port
 
 int open_serial_port(const char *port) {
     int fd = open(port, O_RDWR | O_NOCTTY | O_NDELAY);
