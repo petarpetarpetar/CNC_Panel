@@ -2804,7 +2804,7 @@ bool frmMain::eventFilter(QObject *obj, QEvent *event)
                 if (event->type() == QEvent::KeyPress) emit ui->cmdZPlus->pressed(); else emit ui->cmdZPlus->released();
                 break;
             case Qt::Key_3:
-                if (event->type() == QEvent::KeyPress) emit ui->cmd->pressed(); else emit ui->cmdZMinus->released();
+                if (event->type() == QEvent::KeyPress) emit ui->cmdZMinus->pressed(); else emit ui->cmdZMinus->released();
                 break;
             }
         }
