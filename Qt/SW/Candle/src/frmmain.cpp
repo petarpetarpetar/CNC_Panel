@@ -835,54 +835,10 @@ int frmMain::bufferLength()
     return length;
 }
 
-void frmMain::panelOperation(QString command, QString info){
-    qDebug() << "panelOperation on command: " + command + " = " + info;
-    //PANJog_up=1
-    QSettings set(m_settingsFileName, QSettings::IniFormat);
-    if(command == "Stop") on_cmdStop_clicked();
-    //if(command == "Start")
-    //if(command == "Spindle_speed") ui->slbSpindle->setValue(set.value("spindleSpeed", 20).toInt());
-    if(command == "Jog_up" && info == 1) emit ui->cmdZPlus->pressed(); else emit ui->cmdZPlus->released();
-    if(command == "Jog_down" && info == 1) emit ui->cmdZMinus->pressed(); else emit ui->cmdZMinus->released();
-    if(command == "Jog_left" && info == 1) emit ui->cmdXMinus->pressed(); else emit ui->cmdXMinus->released();
-    if(command == "Jog_right" && info == 1) emit ui->cmdXPlus->pressed(); else emit ui->cmdXPlus->released();
-    if(command == "Forward" && info == 1) emit ui->cmdYPlus->pressed(); else emit ui->cmdYPlus->released();
-    if(command == "Backward" && info == 1) emit ui->cmdYMinus->pressed(); else emit ui->cmdYMinus->released();
-    if(command == "Jog_rate_next") ui->cboJogStep->setCurrentNext();
-    if(command == "Jog_rate_previous") ui->cboJogStep->setCurrentPrevious();
-    if(command == "Jog_feed_next") ui->cboJogFeed->setCurrentNext();
-    if(command == "Jog_feed_previous") ui->cboJogFeed->setCurrentPrevious();
-}
-
 void frmMain::onSerialPortReadyRead()
 {
     while (m_serialPort.canReadLine()) {
         QString data = m_serialPort.readLine().trimmed();
-
-        qDebug() << "While";
-        qDebug() << "data:::::: " + data;
-       
-        bool flag = true;
-        QString panel = "PAN";
-        QString command = "";
-
-        for(int j = 0; j < 3; j++){
-            if(data[j] != panel[j]){
-                flag = false;
-            }
-        }
-
-        if(flag){
-            int i = 3;
-            while(data[i] != '='){
-                command += data[i];  
-                i++;
-            }
-
-            QString info = "";
-            info = data[i+1];
-            panelOperation(command, info);
-        }
 
         // Filter prereset responses
         if (m_reseting) {
@@ -2831,10 +2787,8 @@ bool frmMain::eventFilter(QObject *obj, QEvent *event)
                 (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease)
                 && !static_cast<QKeyEvent*>(event)->isAutoRepeat()) {
 
-            //qDebug() << "Jog on keyboard";
-
             switch (static_cast<QKeyEvent*>(event)->key()) {
-            case Qt::Key_4:     
+            case Qt::Key_4:                
                 if (event->type() == QEvent::KeyPress) emit ui->cmdXMinus->pressed(); else emit ui->cmdXMinus->released();
                 break;
             case Qt::Key_6:
@@ -2850,7 +2804,7 @@ bool frmMain::eventFilter(QObject *obj, QEvent *event)
                 if (event->type() == QEvent::KeyPress) emit ui->cmdZPlus->pressed(); else emit ui->cmdZPlus->released();
                 break;
             case Qt::Key_3:
-                if (event->type() == QEvent::KeyPress) emit ui->cmdZMinus->pressed(); else emit ui->cmdZMinus->released();
+                if (event->type() == QEvent::KeyPress) emit ui->cmd->pressed(); else emit ui->cmdZMinus->released();
                 break;
             }
         }
@@ -3912,8 +3866,7 @@ void frmMain::updateOverride(SliderBox *slider, int value, char command)
         m_serialPort.write(QByteArray(1, char(smallStep ? command + 3 : command + 1)));
     }
 }
-//Filpe debo si 
-//Savim se vep si ;)
+
 void frmMain::jogStep()
 {
     if (m_jogVector.length() == 0) return;
@@ -4024,4 +3977,3 @@ void frmMain::on_cmdStop_clicked()
     m_queue.clear();
     m_serialPort.write(QByteArray(1, char(0x85)));
 }
-

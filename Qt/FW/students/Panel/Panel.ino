@@ -63,7 +63,7 @@ void loop(){
     readF(2);
    
 
-   pinMode(r2, INPUT);
+    pinMode(r2, INPUT);
     pinMode(r1, OUTPUT);
     digitalWrite(r2, 1);
     digitalWrite(r1, 0);
