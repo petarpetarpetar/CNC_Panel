@@ -85,6 +85,21 @@ public:
 
     double toolZPosition();
 
+	// SVI ZAJEDNO SMO PREBACILI OVO OVDE, BILO JE PRIVATE
+    void on_cmdYPlus_pressed();
+    void on_cmdYPlus_released();
+    void on_cmdYMinus_pressed();
+    void on_cmdYMinus_released();
+    void on_cmdXPlus_pressed();
+    void on_cmdXPlus_released();
+    void on_cmdXMinus_pressed();
+    void on_cmdXMinus_released();
+    void on_cmdZPlus_pressed();
+    void on_cmdZPlus_released();
+    void on_cmdZMinus_pressed();
+    void on_cmdZMinus_released();
+    void on_cmdStop_clicked();
+
 private slots:
     void updateHeightMapInterpolationDrawer(bool reset = false);
     void placeVisualizerButtons();
@@ -165,33 +180,8 @@ private slots:
     void on_cmdHeightMapCreate_clicked();
     void on_cmdHeightMapBorderAuto_clicked();
     void on_cmdFileAbort_clicked();
-    void on_cmdSpindle_clicked(bool checked);   
+    void on_cmdSpindle_clicked(bool checked);
 
-    void on_cmdYPlus_pressed();
-
-    void on_cmdYPlus_released();
-
-    void on_cmdYMinus_pressed();
-
-    void on_cmdYMinus_released();
-
-    void on_cmdXPlus_pressed();
-
-    void on_cmdXPlus_released();
-
-    void on_cmdXMinus_pressed();
-
-    void on_cmdXMinus_released();
-
-    void on_cmdZPlus_pressed();
-
-    void on_cmdZPlus_released();
-
-    void on_cmdZMinus_pressed();
-
-    void on_cmdZMinus_released();
-
-    void on_cmdStop_clicked();
 
 protected:
     void showEvent(QShowEvent *se);
@@ -211,7 +201,7 @@ private:
 
     OriginDrawer *m_originDrawer;
 
-    GcodeDrawer *m_codeDrawer;    
+    GcodeDrawer *m_codeDrawer;
     GcodeDrawer *m_probeDrawer;
     GcodeDrawer *m_currentDrawer;
 

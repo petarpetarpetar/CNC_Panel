@@ -90,6 +90,7 @@ frmMain::frmMain(QWidget *parent) :
 
     m_settings = new frmSettings(this);
     ui->setupUi(this);
+	qDebug() << "ANTOVIC SIGMA" << std::endl;
 
 #ifdef WINDOWS
     if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7) {
@@ -99,7 +100,6 @@ frmMain::frmMain(QWidget *parent) :
 #endif
 
 #ifndef UNIX
-	qDebug() << "ANTOVIC SIGMA" << std::endl;
     ui->cboCommand->setStyleSheet("QComboBox {padding: 2;} QComboBox::drop-down {width: 0; border-style: none;} QComboBox::down-arrow {image: url(noimg);	border-width: 0;}");
 #endif
 //    ui->scrollArea->updateMinimumWidth();

@@ -25,7 +25,7 @@ frmSettings::frmSettings(QWidget *parent) :
         ui->listCategories->addItem(box->title());
         ui->listCategories->item(ui->listCategories->count() - 1)->setData(Qt::UserRole, box->objectName());
     }
-
+	
     ui->listCategories->item(0)->setSelected(true);
     connect(ui->scrollSettings->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(onScrollBarValueChanged(int)));
 
@@ -671,7 +671,7 @@ void frmSettings::on_cmdDefaults_clicked()
     setPanelOverriding(true);
     setPanelHeightmap(true);
     setPanelJog(true);
-    setPanelSpindle(true);   
+    setPanelSpindle(true);
 
     ui->clpTool->setColor(QColor(255, 153, 0));
 
