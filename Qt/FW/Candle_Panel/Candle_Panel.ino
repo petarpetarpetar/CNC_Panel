@@ -164,7 +164,7 @@ void loop()
 {
 
 		//static bool connectionState = false;
-		static bool connectionState = true;
+		static bool connectionState = false;
 
 		if (!connectionState)
 		{
