@@ -37,7 +37,7 @@ const String messages[4][5] = {
 		{"PANBackward=", "PANJog_down=", "", "", ""}
 		};
 
-const char controllerIdentifier[] = "CNC Arduino controller";
+const char controllerIdentifier[] = "Candle Panel";
 const char startCommand[] = "START";
 
 uint16_t value;
@@ -62,8 +62,9 @@ void setup()
 		pinMode(N_C[4], INPUT_PULLUP);
 
 		Serial.begin(115200);
-		Serial.println("-------------------------------------------------------------------");
-		Serial.println("Init done");
+		//Serial.println("-------------------------------------------------------------------");
+		//Serial.println("Init done");
+  Serial.println(controllerIdentifier);
 }
 
 
@@ -162,7 +163,7 @@ void read_pb_row(int row){
 
 void loop()
 {
-
+/*
 		//static bool connectionState = false;
 		static bool connectionState = false;
 
@@ -184,6 +185,7 @@ void loop()
 		}
 		else
 		{
+  */
 		/*
 				pinMode(r2, OUTPUT);
 				digitalWrite(r2, 0);
@@ -206,5 +208,5 @@ void loop()
 					read_pb_row(row);
 				}
 
-		}
+//		}
 }

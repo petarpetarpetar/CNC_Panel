@@ -35,6 +35,14 @@
 #include "frmmain.h"
 #include "ui_frmmain.h"
 
+#include <QThread>
+
+#include <QDebug>
+#define DEBUG(var) \
+	do{ \
+		qDebug() << #var << " = " << var; \
+	}while(0)
+
 frmMain::frmMain(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::frmMain)
@@ -90,7 +98,7 @@ frmMain::frmMain(QWidget *parent) :
 
     m_settings = new frmSettings(this);
     ui->setupUi(this);
-	qDebug() << "ANTOVIC SIGMA" << std::endl;
+	qDebug() << "ANTOVIC SIGMA\n";
 
 #ifdef WINDOWS
     if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7) {
@@ -255,19 +263,97 @@ frmMain::frmMain(QWidget *parent) :
             ui->grpSpindle->setTitle(tr("Spindle") + QString(tr(" (%1)")).arg(ui->slbSpindle->value()));
     });
 
+
+	const char* ports[] = {"/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyACM0", "/dev/ttyACM1", "/dev/ttyACM2", "/dev/ttyUSB2"};
+	QString grblPort;
+	QString panelPort;
+	DEBUG(m_settings->baud());
+	const int baud = 115200;
+	for(auto port : ports) {
+		DEBUG(port);
+		QSerialPort s;
+		s.setParity(QSerialPort::NoParity);
+		s.setDataBits(QSerialPort::Data8);
+		s.setFlowControl(QSerialPort::NoFlowControl);
+		s.setStopBits(QSerialPort::OneStop);
+		s.setBaudRate(baud);
+		s.setPortName(port);
+
+		if(!s.open(QIODevice::ReadWrite)){
+			continue;
+		}
+		if(!s.isOpen()){
+			continue;
+		}
+
+
+		if(!s.isDataTerminalReady()){
+			s.setDataTerminalReady(1);
+			QThread::msleep(10);
+		}
+		s.setDataTerminalReady(0);
+		QThread::msleep(10);
+		s.setDataTerminalReady(1);
+
+		if(!s.waitForReadyRead(2000)){
+			continue;
+		}
+		for(int i = 0; i < 2; i++){
+			if(!s.canReadLine()){
+				break;
+			}
+
+			QString line = s.readLine().trimmed();
+			DEBUG(line);
+			if(line == "Grbl 1.1f ['$' for help]") {
+				grblPort = port;
+				DEBUG(grblPort);
+				break;
+			}else if(line == "Candle Panel"){
+				panelPort = port;
+				DEBUG(panelPort);
+				break;
+			}
+		}
+
+
+	}
+	DEBUG(grblPort);
+	DEBUG(panelPort);
+
+
+
     // Setup serial port
     m_serialPort.setParity(QSerialPort::NoParity);
     m_serialPort.setDataBits(QSerialPort::Data8);
     m_serialPort.setFlowControl(QSerialPort::NoFlowControl);
     m_serialPort.setStopBits(QSerialPort::OneStop);
-
+#if 0
     if (m_settings->port() != "") {
         m_serialPort.setPortName(m_settings->port());
         m_serialPort.setBaudRate(m_settings->baud());
     }
-
+#else
+    if (grblPort != "") {
+        m_serialPort.setPortName(grblPort);
+        m_serialPort.setBaudRate(baud);
+    }
+#endif
     connect(&m_serialPort, SIGNAL(readyRead()), this, SLOT(onSerialPortReadyRead()), Qt::QueuedConnection);
     connect(&m_serialPort, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(onSerialPortError(QSerialPort::SerialPortError)));
+
+
+	m_panelSerialPort.setParity(QSerialPort::NoParity);
+	m_panelSerialPort.setDataBits(QSerialPort::Data8);
+	m_panelSerialPort.setFlowControl(QSerialPort::NoFlowControl);
+	m_panelSerialPort.setStopBits(QSerialPort::OneStop);
+	if (panelPort != "") {
+		m_panelSerialPort.setPortName(panelPort);
+		m_panelSerialPort.setBaudRate(baud);
+	}
+    connect(&m_panelSerialPort, SIGNAL(readyRead()), this, SLOT(onPanelSerialPortReadyRead()), Qt::QueuedConnection);
+    connect(&m_panelSerialPort, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(onPanelSerialPortError(QSerialPort::SerialPortError)));
+
 
     this->installEventFilter(this);
     ui->tblProgram->installEventFilter(this);
@@ -734,6 +820,10 @@ void frmMain::openPort()
         ui->txtStatus->setStyleSheet(QString("background-color: palette(button); color: palette(text);"));
 //        updateControlsState();
         grblReset();
+    }
+	if (m_panelSerialPort.open(QIODevice::ReadWrite)) {
+        ui->txtStatus->setText(tr("Panel port opened"));
+        ui->txtStatus->setStyleSheet(QString("background-color: palette(button); color: palette(text);"));
     }
 }
 
@@ -1376,6 +1466,30 @@ void frmMain::onSerialPortError(QSerialPort::SerialPortError error)
         ui->txtConsole->appendPlainText(tr("Serial port error ") + QString::number(error) + ": " + m_serialPort.errorString());
         if (m_serialPort.isOpen()) {
             m_serialPort.close();
+            updateControlsState();
+        }
+    }
+}
+
+void frmMain::onPanelSerialPortReadyRead()
+{
+	DEBUG(m_panelSerialPort.canReadLine());
+    while (m_panelSerialPort.canReadLine()) {
+        QString data = m_panelSerialPort.readLine().trimmed();
+		DEBUG(data);
+		emit ui->cmdZPlus->pressed();
+		emit ui->cmdZPlus->released();
+	}
+}
+void frmMain::onPanelSerialPortError(QSerialPort::SerialPortError error)
+{
+    static QSerialPort::SerialPortError previousError;
+
+    if (error != QSerialPort::NoError && error != previousError) {
+        previousError = error;
+        ui->txtConsole->appendPlainText(tr("Panel serial port error ") + QString::number(error) + ": " + m_panelSerialPort.errorString());
+        if (m_panelSerialPort.isOpen()) {
+            m_panelSerialPort.close();
             updateControlsState();
         }
     }
