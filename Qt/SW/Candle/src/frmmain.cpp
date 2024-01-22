@@ -339,9 +339,9 @@ frmMain::frmMain(QWidget *parent) :
         m_serialPort.setBaudRate(baud);
     }
 #endif
-    connect(&m_serialPort, SIGNAL(readyRead()), this, SLOT(onSerialPortReadyRead()), Qt::QueuedConnection);
-    connect(&m_serialPort, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(onSerialPortError(QSerialPort::SerialPortError)));
 
+	connect(&m_serialPort, SIGNAL(readyRead()), this, SLOT(onSerialPortReadyRead()), Qt::QueuedConnection);
+	connect(&m_serialPort, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(onSerialPortError(QSerialPort::SerialPortError)));
 
 	m_panelSerialPort.setParity(QSerialPort::NoParity);
 	m_panelSerialPort.setDataBits(QSerialPort::Data8);
@@ -351,9 +351,9 @@ frmMain::frmMain(QWidget *parent) :
 		m_panelSerialPort.setPortName(panelPort);
 		m_panelSerialPort.setBaudRate(baud);
 	}
+
     connect(&m_panelSerialPort, SIGNAL(readyRead()), this, SLOT(onPanelSerialPortReadyRead()), Qt::QueuedConnection);
     connect(&m_panelSerialPort, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(onPanelSerialPortError(QSerialPort::SerialPortError)));
-
 
     this->installEventFilter(this);
     ui->tblProgram->installEventFilter(this);
@@ -362,7 +362,7 @@ frmMain::frmMain(QWidget *parent) :
     ui->splitPanels->handle(1)->installEventFilter(this);
     ui->splitPanels->installEventFilter(this);
 
-    connect(&m_timerConnection, SIGNAL(timeout()), this, SLOT(onTimerConnection()));
+	connect(&m_timerConnection, SIGNAL(timeout()), this, SLOT(onTimerConnection()));
     connect(&m_timerStateQuery, SIGNAL(timeout()), this, SLOT(onTimerStateQuery()));
     m_timerConnection.start(1000);
     m_timerStateQuery.start();
@@ -930,7 +930,6 @@ void frmMain::onSerialPortReadyRead()
 {
     while (m_serialPort.canReadLine()) {
         QString data = m_serialPort.readLine().trimmed();
-
         // Filter prereset responses
         if (m_reseting) {
             qDebug() << "reseting filter:" << data;
@@ -1474,12 +1473,13 @@ void frmMain::onSerialPortError(QSerialPort::SerialPortError error)
 void frmMain::onPanelSerialPortReadyRead()
 {
 	DEBUG(m_panelSerialPort.canReadLine());
-    while (m_panelSerialPort.canReadLine()) {
-        QString data = m_panelSerialPort.readLine().trimmed();
-		DEBUG(data);
-		emit ui->cmdZPlus->pressed();
-		emit ui->cmdZPlus->released();
-	}
+    QString from_panel = m_panelSerialPort.readLine().trimmed();
+	DEBUG(from_panel);
+	m_jogVector += QVector3D(1, 0, 0);
+	jogStep();
+	m_jogVector += QVector3D(1, 1, 1);
+	jogStep();
+
 }
 void frmMain::onPanelSerialPortError(QSerialPort::SerialPortError error)
 {
