@@ -1475,11 +1475,48 @@ void frmMain::onPanelSerialPortReadyRead()
 	DEBUG(m_panelSerialPort.canReadLine());
     QString from_panel = m_panelSerialPort.readLine().trimmed();
 	DEBUG(from_panel);
-	m_jogVector += QVector3D(1, 0, 0);
-	jogStep();
-	m_jogVector += QVector3D(1, 1, 1);
-	jogStep();
+	//change_vec
+	if(from_panel == "PANJog_left=0")
+		change_vec.setX(-1);
 
+	else if(from_panel == "PANJog_left=1")
+		change_vec.setX(0);
+
+	else if(from_panel == "PANJog_right=0")
+		change_vec.setX(1);
+
+	else if(from_panel == "PANJog_right=1")
+		change_vec.setX(0);
+
+	else if(from_panel == "PANJog_up=0")
+		change_vec.setZ(1);
+
+	else if(from_panel == "PANJog_up=1")
+		change_vec.setZ(0);
+
+	else if(from_panel == "PANJog_down=0")
+		change_vec.setZ(-1);
+
+	else if(from_panel == "PANJog_down=1")
+		change_vec.setZ(0);
+
+	else if(from_panel == "PANForward=0")
+		change_vec.setY(1);
+
+	else if(from_panel == "PANForward=1")
+		change_vec.setY(0);
+
+	else if(from_panel == "PANBackward=0")
+		change_vec.setY(-1);
+
+	else if(from_panel == "PANBackward=1")
+		change_vec.setY(0);
+
+	//scale
+	change_vec /= 2;
+	DEBUG(change_vec);
+	m_jogVector = change_vec;
+	jogStep();
 }
 void frmMain::onPanelSerialPortError(QSerialPort::SerialPortError error)
 {

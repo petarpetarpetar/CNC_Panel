@@ -225,6 +225,7 @@ private:
 
     QSerialPort m_serialPort;
     QSerialPort m_panelSerialPort;
+	QVector3D change_vec;
 
     frmSettings *m_settings;
     frmAbout m_frmAbout;
